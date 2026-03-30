@@ -7,13 +7,11 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-
     public function index()
     {
         $cart = session()->get('cart', []);
         return view('pages.cart', compact('cart'));
     }
-
 
     public function add($id)
     {
@@ -30,37 +28,34 @@ class CartController extends Controller
                 "image" => $product->image,
                 "quantity" => 1
             ];
+
+        }
+            session()->put('cart', $cart);
+
+            return redirect()->back();
         }
 
-        session()->put('cart', $cart);
-
-        return redirect()->back();
-    }
-
- 
     public function remove($id)
     {
         $cart = session()->get('cart', []);
 
-        if(isset($cart[$id])) {
+        if (isset($cart[$id])) {
             unset($cart[$id]);
         }
 
         session()->put('cart', $cart);
 
-        return redirect()->back();
+        return redirect()->route('cart.index');
     }
 
-  
     public function update(Request $request, $id)
     {
         $cart = session()->get('cart', []);
 
-        if(isset($cart[$id])) {
+        if (isset($cart[$id])) {
+            $qty = (int) $request->quantity;
 
-            $qty = (int)$request->quantity;
-
-            if($qty <= 0){
+            if ($qty <= 0) {
                 unset($cart[$id]);
             } else {
                 $cart[$id]['quantity'] = $qty;
@@ -69,6 +64,6 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
-        return redirect()->back();
+        return redirect()->route('cart.index');
     }
 }
